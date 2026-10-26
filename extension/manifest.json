@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "PDF Extractor (pdfx)",
+  "version": "1.0.0",
+  "description": "Extract text from a PDF (file or current tab) via your local pdfx API. Fully local.",
+  "permissions": [
+    "activeTab"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1:8765/*",
+    "http://localhost:8765/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "PDF Extractor"
+  }
+}

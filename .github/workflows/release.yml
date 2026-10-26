@@ -1,0 +1,58 @@
+name: Release installers
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            artifact: pdfx-windows
+          - os: ubuntu-latest
+            artifact: pdfx-linux
+          - os: macos-latest
+            artifact: pdfx-macos
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install
+        run: |
+          pip install -e ".[api]" pyinstaller pytest
+      - name: Test
+        run: pytest -q
+      - name: Build binary
+        run: pyinstaller --onefile --name pdfx --collect-all pdfminer --collect-all docx app_entry.py
+      - name: Package Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Compress-Archive -Path dist/pdfx.exe -DestinationPath pdfx-windows.zip
+          choco install innosetup -y --no-progress
+          if (Test-Path packaging/pdfx.iss) { & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" packaging/pdfx.iss }
+      - name: Package Linux/macOS
+        if: runner.os != 'Windows'
+        run: |
+          tar -czf pdfx-${{ runner.os }}.tar.gz -C dist pdfx
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: |
+            pdfx-windows.zip
+            pdfx-*.tar.gz
+            Output/*.exe
+          if-no-files-found: ignore
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            pdfx-windows.zip
+            pdfx-*.tar.gz
+            Output/*.exe
