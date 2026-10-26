@@ -47,6 +47,7 @@ jobs:
             pdfx-windows.zip
             pdfx-*.tar.gz
             Output/*.exe
+            packaging/Output/*.exe
           if-no-files-found: ignore
       - name: Release
         if: startsWith(github.ref, 'refs/tags/')
@@ -56,3 +57,4 @@ jobs:
             pdfx-windows.zip
             pdfx-*.tar.gz
             Output/*.exe
+            packaging/Output/*.exe
