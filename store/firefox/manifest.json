@@ -1,0 +1,35 @@
+{
+  "action": {
+    "default_icon": {
+      "128": "icons/icon128.png",
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png"
+    },
+    "default_popup": "popup.html",
+    "default_title": "PDF Extractor"
+  },
+  "description": "Extract text from a PDF (file or current tab) via your local pdfx API. Extraction runs on your own machine.",
+  "host_permissions": [
+    "http://127.0.0.1:8765/*"
+  ],
+  "icons": {
+    "128": "icons/icon128.png",
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png"
+  },
+  "manifest_version": 3,
+  "name": "PDF Extractor (pdfx)",
+  "permissions": [
+    "activeTab",
+    "clipboardWrite"
+  ],
+  "version": "1.0.1",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "pdfx@aimlds.org",
+      "strict_min_version": "109.0"
+    }
+  }
+}
