@@ -65,3 +65,31 @@ BLOCK on the 1.0.0 package; see `store/GEMINI-CHECK-2026-10-30.md`):
 - Store listing copy corrected: the "fully local" headline is
   qualified — the tab path downloads the PDF from the remote page the
   user is viewing; extraction itself runs on the user's machine.
+
+### Extension store remediation round 3 — 2026-10-30
+
+Extension version remains **1.0.1** (pre-submission; nothing has been
+submitted yet). The tab-fetch architecture was replaced after the
+Gemini re-check's deciding generation held the SSRF blocker open
+against rounds 1–2: hostname validation from extension JavaScript
+cannot close SSRF while DNS resolution is the browser's, beyond the
+extension's control.
+
+- The browser extension no longer fetches the tab PDF at all. The
+  "Use current tab PDF URL" button sends the tab's URL to the local
+  API's new `POST /extract-url` endpoint and renders the returned
+  extraction. The extension's URL validation survives only as a UX
+  pre-check, commented as not the security boundary.
+- The local API now performs the download where resolution can be
+  inspected and pinned: it resolves the host, refuses the request if
+  ANY resolved address is loopback, private, link-local, multicast,
+  reserved, or unspecified, connects to the validated IP directly
+  (hostname used only for the Host header and TLS server name),
+  follows redirects manually (max 3) with the full validation
+  repeated at every hop, enforces the 50 MB cap, and verifies the
+  PDF content type / `%PDF` magic bytes before the bytes reach the
+  same extraction path as `/extract`. No cookies or credentials are
+  sent.
+- Store listing and submission notes rewritten to the new
+  architecture (the local API fetches and validates; the extension
+  never fetches remote content).

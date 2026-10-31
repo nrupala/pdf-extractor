@@ -1,10 +1,26 @@
-const API_URL = 'http://127.0.0.1:8765/extract';
-const MAX_TAB_PDF_BYTES = 50 * 1024 * 1024; // 50 MB cap on tab-PDF downloads
+const API_BASE = 'http://127.0.0.1:8765';
+const API_URL = API_BASE + '/extract';
+const EXTRACT_URL_ENDPOINT = API_BASE + '/extract-url';
 let blobUrl = null, lastText = "";
 
-// Loopback, link-local, and private-network hosts are never valid tab-PDF
-// sources: the tab feature exists to fetch a public PDF the user is viewing,
-// not to reach the user's own network from the extension.
+// --- Tab-URL pre-check (UX only — NOT the security boundary) -------------
+// The checks in this section exist ONLY to give a fast, plain-language
+// error when the current tab obviously is not a public PDF (wrong scheme,
+// intranet host, path not ending in .pdf). They are not the security
+// boundary and are not represented as one: hostname validation in
+// extension JavaScript cannot close SSRF, because DNS resolution happens
+// inside the browser, beyond the extension's control — a name that
+// validates can still resolve, or be redirected, to a loopback or
+// private address (Gemini pre-store check, deciding generation,
+// 2026-10-30). The boundary is the local API's POST /extract-url: the
+// extension sends it the tab's URL, and the API resolves the host
+// itself, refuses the request if ANY resolved address is non-public,
+// pins the connection to the validated IP, and re-validates every
+// redirect hop in full before following it. The extension never fetches
+// remote content itself.
+
+// Loopback, link-local, and private-network hosts are never plausible
+// tab-PDF sources, so the pre-check rejects them for a clear message.
 function isLocalOrPrivateHost(hostname) {
   const host = (hostname || '').toLowerCase();
   if (!host) return true;
@@ -31,8 +47,10 @@ function isLocalOrPrivateHost(hostname) {
   return false;
 }
 
-// Strict validation for the "Use current tab PDF URL" path: http(s) only,
-// public host only, and the URL path must actually end in .pdf.
+// Pre-check for the "Use current tab PDF URL" path: http(s) only, public
+// host only, and the URL path must actually end in .pdf. The API applies
+// the real validation to whatever this returns (see the boundary note
+// above); failing here just fails faster and clearer.
 function validateTabPdfUrl(rawUrl) {
   let u;
   try { u = new URL(rawUrl); } catch (e) { return null; }
@@ -42,33 +60,15 @@ function validateTabPdfUrl(rawUrl) {
   return u.href;
 }
 
-// Download a validated tab PDF, enforcing the size cap and verifying the
-// response really is a PDF before the bytes go anywhere near the local API.
-async function fetchTabPdf(url) {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error('Could not download the tab PDF (HTTP ' + res.status + ').');
-  const declared = Number(res.headers.get('content-length') || 0);
-  if (declared > MAX_TAB_PDF_BYTES) throw new Error('That PDF is over the 50 MB limit for tab downloads.');
-  const buf = await res.arrayBuffer();
-  if (buf.byteLength > MAX_TAB_PDF_BYTES) throw new Error('That PDF is over the 50 MB limit for tab downloads.');
-  const ct = (res.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
-  if (ct === 'application/octet-stream' || ct === 'binary/octet-stream') {
-    const head = new Uint8Array(buf.slice(0, 4));
-    const isPdf = head.length === 4 && head[0] === 0x25 && head[1] === 0x50 && head[2] === 0x44 && head[3] === 0x46; // %PDF
-    if (!isPdf) throw new Error('The tab URL did not return a PDF file.');
-  } else if (ct !== 'application/pdf') {
-    throw new Error('The tab URL returned "' + (ct || 'an unknown content type') + '", not a PDF.');
+// Render one API response (shared by the file path and the tab-URL path).
+// The API's own error message is preferred when it sends one — /extract-url
+// refuses with plain-language reasons the user should see verbatim.
+async function showResult(res, fmt) {
+  if (!res.ok) {
+    let msg = 'API error ' + res.status + ' - is pdfx-api running?';
+    try { const j = await res.json(); if (j && j.error) msg = j.error; } catch (e) { /* keep the default */ }
+    throw new Error(msg);
   }
-  return new File([buf], 'tab.pdf', { type: 'application/pdf' });
-}
-
-async function send(file) {
-  const fmt = document.getElementById('format').value;
-  const fd = new FormData();
-  fd.append('file', file);
-  fd.append('format', fmt);
-  const res = await fetch(API_URL, { method: 'POST', body: fd });
-  if (!res.ok) throw new Error('API error ' + res.status + ' - is pdfx-api running?');
   if (fmt === 'json') {
     const j = await res.json();
     lastText = j.text || JSON.stringify(j, null, 2);
@@ -90,6 +90,29 @@ async function send(file) {
   document.getElementById('copy').style.display = lastText ? 'block' : 'none';
 }
 
+async function send(file) {
+  const fmt = document.getElementById('format').value;
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('format', fmt);
+  const res = await fetch(API_URL, { method: 'POST', body: fd });
+  await showResult(res, fmt);
+}
+
+// The tab path downloads nothing in the browser: the tab's URL goes to the
+// local API, which fetches and validates it on the user's own machine
+// (resolve -> classify -> pin -> re-validated redirects; see the boundary
+// note at the top) and returns the extraction result.
+async function sendTabUrl(url) {
+  const fmt = document.getElementById('format').value;
+  const res = await fetch(EXTRACT_URL_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url: url, format: fmt }),
+  });
+  await showResult(res, fmt);
+}
+
 document.getElementById('go').onclick = async () => {
   const f = document.getElementById('file').files[0];
   if (!f) { document.getElementById('out').textContent = 'Pick a PDF file first, or use the tab button.'; return; }
@@ -100,6 +123,6 @@ document.getElementById('tab').onclick = async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   const url = tab && tab.url ? validateTabPdfUrl(tab.url) : null;
   if (!url) { out.textContent = 'Current tab is not a public http(s) PDF URL.'; return; }
-  try { await send(await fetchTabPdf(url)); } catch (e) { out.textContent = String(e); }
+  try { await sendTabUrl(url); } catch (e) { out.textContent = String(e); }
 };
 document.getElementById('copy').onclick = () => navigator.clipboard.writeText(lastText);

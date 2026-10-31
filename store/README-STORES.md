@@ -33,6 +33,17 @@ included, 8 entries per zip):
 - `pdfx-chrome-edge.zip` — `f7a4408325bc9b774cdd6239798c7f4b99bb036fd1bfa4b2a2c67d1b7a78f464`
 - `pdfx-firefox.zip` — `2d14496ad98bc4a854ed3030741955e2d016a4999e1470087948d72d75e84aff`
 
+SHA-256 (2026-10-30 remediation round 2 rebuild — extension v1.0.1,
+manual redirect handling in the tab-PDF fetch, 8 entries per zip):
+- `pdfx-chrome-edge.zip` — `2898a9f3ea14d67f3f8dfafc9e7ed2c49f8ecae3963ff36ce6b1cfd161792eda`
+- `pdfx-firefox.zip` — `a7a9f72daba3623472d8310593d6e735974edad1a26c2b6f68c1c233fa9f351e`
+
+SHA-256 (2026-10-30 remediation round 3 rebuild — extension v1.0.1,
+tab fetch moved out of the browser into the local API's
+`/extract-url`, 8 entries per zip):
+- `pdfx-chrome-edge.zip` — `ae18a1cdfb8eb5f41d193f7fce7ef98b6b7f2de21ee431b1cf2d78264cdb9b6e`
+- `pdfx-firefox.zip` — `10b894a5507fc34788886cdb8ee3e37201d2123a261ae80cc1f77b09ceedc189`
+
 ## Validation performed on these packages (2026-10-30)
 
 - ZIP integrity (`testzip`) + listing verified for both zips;
@@ -62,15 +73,20 @@ included, 8 entries per zip):
   (loopback, the product's own local API); (2) "Use current tab PDF
   URL" — `chrome.tabs.query` (hence `activeTab`, which IS exercised
   here, unlike PDFStruct) reads the active tab's URL, and the
-  extension `fetch`es the PDF **from that remote URL** before handing
-  it to the local API. The listing's privacy statement discloses this
-  exactly; a reviewer question about it is answered by the
-  user-viewing-the-page fact, not by claiming loopback-only traffic.
-- `popup.js` hardcodes `127.0.0.1:8765`; the manifest also declares
+  extension POSTs **the URL itself** to the local API's
+  `/extract-url`. The extension never fetches remote content
+  (remediation round 3, 2026-10-30 — earlier builds fetched the tab
+  PDF in the browser; that path is gone). The local API performs the
+  download on the user's own machine under the resolve → classify →
+  pin defence recorded in finding #4 below. The listing's privacy
+  statement discloses this exactly; a reviewer question about it is
+  answered by the user-viewing-the-page fact plus the API-side
+  validation, not by claiming the extension is the fetch boundary.
+- `popup.js` hardcodes `127.0.0.1:8765`; the manifest also declared
   `http://localhost:8765/*`, which the code never calls. Least-
   privilege reviewers may flag the unused alias (the PDFStruct
-  Gemini check flagged the same pattern). Dropping it is a source
-  change for the submission lane to decide on, with a zip rebuild.
+  Gemini check flagged the same pattern). — **RESOLVED 2026-10-30:**
+  the alias was dropped (see Known findings #2).
 - Under Firefox MV3, `host_permissions` are treated as optional,
   user-granted permissions (not granted automatically at install), so
   a Firefox user may need to grant access to `127.0.0.1` before the
@@ -98,6 +114,34 @@ included, 8 entries per zip):
    matching the package.
 3. **No smoke harness / no browser-load proof** — still open; see
    Validation.
+4. **Tab-fetch SSRF / DNS** — **ARCHITECTURE REPLACED 2026-10-30
+   (remediation round 3):** rounds 1–2 hardened the browser-side
+   fetch (strict hostname validation, then manual redirect
+   re-validation), but Gemini's deciding generation held the blocker
+   open: hostname validation from extension JavaScript cannot close
+   SSRF while DNS resolution is the browser's, beyond the extension's
+   control. The fetch therefore no longer happens in the browser at
+   all. The extension sends the tab's URL to the local API's
+   `POST /extract-url`, and the API — where resolution CAN be
+   inspected and pinned — resolves the host with
+   `socket.getaddrinfo`, refuses the request if ANY resolved address
+   is loopback / private / link-local / multicast / reserved /
+   unspecified (ipaddress classification), connects to the validated
+   IP directly (hostname used only for the Host header and, for
+   HTTPS, the TLS server_hostname, so SNI + certificate verification
+   still apply to the real name), follows redirects manually (max 3)
+   with the full validation repeated at every hop, and enforces the
+   50 MB cap + PDF content-type / `%PDF` magic checks before the
+   bytes reach the same extraction path as `/extract`. The
+   extension's `validateTabPdfUrl` survives only as a UX pre-check
+   and is commented as such — the API is the boundary.
+   **Honest limit:** a hostname that resolves publicly at check time
+   could in theory re-resolve differently for a DIFFERENT client, but
+   this fetch never re-resolves — the connection uses the pinned,
+   already-classified IP — so nothing on the fetch path remains for
+   DNS rebinding to act on; what is left is trust in the resolver's
+   answer at resolution time itself, constrained by the
+   classification.
 
 ## Chrome Web Store checklist
 
@@ -117,7 +161,9 @@ included, 8 entries per zip):
 - [ ] Submit for review; respond to any reviewer query with the
       local-API architecture note (the extension is inert without
       the user's own local API, by design) and the tab-feature
-      explanation (user-initiated download of the page being viewed).
+      explanation (at the user's click, the local API downloads the
+      page being viewed under the resolve → classify → pin defence;
+      the extension fetches nothing remote).
 
 ## Microsoft Edge Add-ons checklist
 
@@ -150,7 +196,9 @@ included, 8 entries per zip):
       Note the "requires additional software" fact honestly: the
       add-on needs the free local pdfx API running (see listing copy).
 - [ ] Reviewer notes: local-API architecture, plus the tab-feature
-      disclosure (user-initiated fetch of the viewed page's PDF);
+      disclosure (user-initiated; the local API fetches the viewed
+      page's PDF under the resolve → classify → pin defence, the
+      extension itself fetches nothing remote);
       source is plain, unminified JS (no source-upload obligation
       expected); the Gecko ID is `pdfx@aimlds.org`.
 - [ ] **Mozilla signs every build** — the listed version goes live
