@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 2351485 ALBERTA INC.
+//
+// SPDX-License-Identifier: MIT
+
 "use strict";
 /*
  * PDF Extractor (pdfx) — on-device model layer for talk-to-the-page.
