@@ -1,20 +1,8 @@
 "use strict";
-/*
- * PDF Extractor (pdfx) — in-browser extraction engine.
- *
- * Everything runs inside the extension with the vendored pdf.js build
- * (vendor/pdf.min.js, Apache-2.0, Mozilla). No companion app, no local
- * API, no network: the document object produced here mirrors the shape
- * the Python engine (src/pdfx/core.py) returns — {source, engine,
- * text, text_length, metadata, structure, index} — so the .txt/.md/
- * .json outputs match the CLI/API outputs for the same document.
- *
- * Word (.docx) output is generated locally by the minimal OOXML
- * writer at the bottom of this file (store-only ZIP, no dependency),
- * mirroring src/pdfx/outputs.py write_docx.
- *
- * Copyright (c) 2026 2351485 ALBERTA INC. — MIT (see ../LICENSE).
- */
+
+// Copyright (c) 2026 2351485 ALBERTA INC. — MIT (see ../LICENSE).
+//
+// SPDX-License-Identifier: MIT
 (function (root) {
 
 // ---------------------------------------------------------------- text
