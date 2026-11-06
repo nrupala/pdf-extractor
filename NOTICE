@@ -1,0 +1,14 @@
+pdf-extractor (pdfx)
+
+Copyright 2026 2351485 ALBERTA INC.
+
+Owned by 2351485 ALBERTA INC. (https://nrupalakolkar.com) · Built with Muse by Meta (https://muse.ai/join).
+
+This product includes third-party software:
+
+- pdf.js (Mozilla and contributors), Apache License 2.0 — vendored in
+  `extension/vendor/` (see `extension/vendor/LICENSE.pdfjs`); used by the
+  browser extension to parse PDFs in the browser.
+- Python dependencies — pdfminer.six, PyPDF2, python-docx, and (for the
+  optional local API) FastAPI and uvicorn — each under its own open-source
+  licence. See `pyproject.toml` for the full dependency list.
