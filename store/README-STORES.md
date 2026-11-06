@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2026 2351485 ALBERTA INC.
+
+SPDX-License-Identifier: MIT
+-->
+
 # PDF Extractor (pdfx) extension — store submission checklists (STAGING ONLY)
 
 Prepared 2026-10-30. Nothing here has been submitted anywhere. No
