@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2026 2351485 ALBERTA INC.
+
+SPDX-License-Identifier: MIT
+-->
+
 # PDF Extractor (pdfx) extension — Gemini pre-store check (2026-10-30)
 
 **Outcome: BLOCK** (per Gemini — verdict line below.)
