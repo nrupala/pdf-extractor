@@ -104,12 +104,23 @@ function renderResult() {
 // page count, route large documents to the workspace, extract small
 // ones here with progress. No timeout anywhere — a document takes
 // as long as it takes.
-async function handleBytes(bytes, blob, name) {
-  const pages = await PdfxEngine.countPages(lib, bytes);
+//
+// Buffer discipline (browser proof 2026-11-05, defect F2): pdf.js
+// TRANSFERS the buffer handed to getDocument to its worker, which
+// detaches the caller's copy — so a buffer spent on the page-count
+// probe is dead before extraction starts ("An ArrayBuffer is
+// detached and could not be cloned"). The popup therefore keeps
+// the Blob (a picked File IS a Blob; the tab path wraps its fetch
+// response in one) and reads FRESH bytes for every pdf.js call —
+// the same re-readable pattern the workspace uses in extractBlob.
+async function handleBytes(blob, name) {
+  const probe = new Uint8Array(await blob.arrayBuffer());
+  const pages = await PdfxEngine.countPages(lib, probe);
   if (pages > WORKSPACE_PAGE_LIMIT) {
     await routeToWorkspace(blob, name, pages);
     return;
   }
+  const bytes = new Uint8Array(await blob.arrayBuffer());
   lastDoc = await PdfxEngine.extractDocument(lib, bytes, name, setProgress);
   renderResult();
 }
@@ -122,8 +133,7 @@ $("go").onclick = async () => {
     return;
   }
   try {
-    const buf = await f.arrayBuffer();
-    await handleBytes(new Uint8Array(buf), f, f.name);
+    await handleBytes(f, f.name);
   } catch (e) {
     setProgress(0, 0);
     $("out").textContent = `Could not extract that PDF: ${e.message || e}`;
@@ -155,7 +165,6 @@ $("tab").onclick = async () => {
     const name = decodeURIComponent(
       new URL(url).pathname.split("/").pop() || "tab.pdf");
     await handleBytes(
-      new Uint8Array(buf),
       new Blob([buf], { type: "application/pdf" }),
       name);
   } catch (e) {

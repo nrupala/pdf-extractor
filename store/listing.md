@@ -89,14 +89,13 @@ and no checkout. If it saved you time, tips are welcome (see Support).
 and pipelines: https://github.com/nrupala/pdf-extractor. The
 extension does not need it; it is there if you want it.
 
-## What's new (1.1.0)
+## What's new (1.1.1)
 
-The extension is now self-contained: the extraction engine runs
-entirely in your browser (no companion app to install or start),
-large documents open in a full-tab workspace with page-by-page
-progress and no time limit, and Word (.docx) export is generated
-in the browser. This text copies the CHANGELOG entry for Extension
-1.1.0 verbatim, per the update-chain rule.
+Two fixes, both found by testing 1.1.0 in a real browser:
+downloads work again (every download button produced no file),
+and popup extraction works again (it failed on every PDF with a
+detached-buffer error). This text copies the CHANGELOG entry for
+Extension 1.1.1 verbatim, per the update-chain rule.
 
 ## Category suggestion
 

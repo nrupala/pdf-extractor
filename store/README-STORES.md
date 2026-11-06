@@ -243,3 +243,31 @@ built for the AMO path: `pdfx-firefox-nomodel.zip` — SHA-256
 omitted (the model is then the catalogue's first download). If the
 fallback is what ships to AMO, the Firefox listing's bundled-model
 wording must be scoped accordingly at submission.
+
+---
+
+## Fix rebuild 2026-11-05 — extension 1.1.1 (defects F1 + F2)
+
+Rebuilt after Wright's real-browser proof of the 1.1.0 packages
+(browser proof 2026-11-05) found two defects: F1 — every download
+silently produced no file (detached-anchor click); F2 — popup
+extraction always failed on a detached ArrayBuffer. Fixes are in
+`extension/docstore.js` (shared attached-anchor download helper),
+`extension/popup.js` (Blob re-read per pdf.js call) and
+`extension/workspace.js` (private helper copy removed); the
+Firefox staging tree was re-synced from the same build.
+
+SHA-256 (2026-11-05 fix build):
+- `pdfx-chrome-edge.zip` — `14ea551cffa5d77b3d7f7828bc11610fa7e2a9770f8574eeffbcbc26407687e7` (403,373,743 bytes, 34 entries)
+- `pdfx-firefox.zip` — `7a96da0ff09823f0c3ba3c4778d9be1df74057a97cffbcdf263ec41558512729` (403,373,831 bytes, 34 entries)
+- `pdfx-firefox-nomodel.zip` — `e27048590d66db97f8ce739d2bc42f9ed67bb56e68ea7a60cb7a80bf9ccf8e2d` (9,851,547 bytes, 33 entries)
+
+Validation on these packages: manifest read back from inside
+each zip (version 1.1.1; gecko block in the Firefox variants
+only); the changed files (docstore.js, workspace.js, popup.js,
+manifest.json) are byte-identical to the source tree inside
+every zip; the bundled model file inside each full zip measures
+483,003,582 bytes. Extension smoke 67 PASS / 0 FAIL (was 54 —
+the F1/F2 regression sections are the delta, and they fail
+against the shipped 1.1.0 popup.js). NOT RUN here: the
+real-browser re-proof — Wright's leg before submission.

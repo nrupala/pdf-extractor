@@ -8,6 +8,33 @@ browser extension version lives in `extension/manifest.json`. Under the
 owner's rule, every version bump carries its entry in this file in the
 same commit — this file is the start of that chain.
 
+## [Extension 1.1.1] — 2026-11-05
+
+Two fixes, both found by testing 1.1.0 in a real browser:
+downloads work again (every download button produced no file),
+and popup extraction works again (it failed on every PDF with a
+detached-buffer error).
+
+### Fixed
+
+- Downloads produced no file anywhere in the extension —
+  workspace document downloads, knowledgebank item downloads and
+  bank/container exports all went through a helper that clicked
+  an anchor never attached to the document, which Chrome
+  extension pages ignore (browser proof 2026-11-05, defect F1).
+  The helper now lives in one place (`docstore.js`, loaded by
+  both pages), attaches the anchor before clicking and removes
+  it after; if a download still cannot start, the page says so
+  visibly instead of failing silently.
+- Popup extraction always failed with "An ArrayBuffer is
+  detached and could not be cloned": pdf.js transfers the buffer
+  handed to it to its worker, and the popup spent one buffer on
+  the page-count probe and then tried to extract from it
+  (browser proof 2026-11-05, defect F2). The popup now keeps the
+  PDF as a Blob and reads fresh bytes for every pdf.js call —
+  the pattern the workspace already used — on both entry points
+  (picked file and current-tab PDF).
+
 ## [Extension 1.1.0] — 2026-11-05
 
 The extension is now self-contained: the extraction engine runs
