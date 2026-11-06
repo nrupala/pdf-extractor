@@ -44,9 +44,21 @@ at the `pdfx-mcp` command.
 
 ### 4. Browser extension
 
-Load `extension/` unpacked (Developer mode in Chrome/Edge). It needs the
-local app/API running (step 2). Pick a PDF file or use the current tab's PDF
-URL, then view, copy, or download the result. See `extension/README.md`.
+Load `extension/` unpacked (Developer mode in Chrome/Edge). Since 1.1.0
+the extension is self-contained — the extraction engine (pdf.js) ships
+inside it; no local app or API needs to be running. Pick a PDF file or
+use the current tab's PDF, then view, copy, or download the result
+(`.txt` / `.md` / `.json` / `.docx`). Documents over 25 pages open in
+a full-tab workspace with a knowledgebank (file documents or page
+ranges into containers with tags; edit, move, delete, export — all
+local in IndexedDB) and talk-to-the-page (passage retrieval with
+citations, phrased by a bundled on-device model; free talk metered at
+15 minutes of use, Pro is a one-time lifetime unlock — no
+subscription). See `extension/README.md`.
+
+(The bundled model weights are not in git — GitHub's file limit;
+`tools/fetch-model.sh` restores them, SHA-256 pinned. The store
+packages are built complete.)
 
 ### Installers
 

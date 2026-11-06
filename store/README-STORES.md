@@ -207,3 +207,39 @@ tab fetch moved out of the browser into the local API's
 - [ ] Ownership can be transferred or co-owners added later via
       Developer Hub → Manage Authors & License, so starting on the
       personal account does not lock the add-on to it.
+
+---
+
+## Rebuild 2026-11-05 — extension 1.1.0 (self-contained)
+
+The packages above were rebuilt for 1.1.0: the extension is now
+self-contained (vendored pdf.js engine, workspace tab, knowledgebank,
+talk-to-the-page with a bundled on-device model). Package contents
+are now the full extension tree (34 entries: manifest, popup,
+workspace, engine/docstore/bank/talk/model scripts, icons, vendor/
+including the PDF.js engine, the Transformers.js runtime, and the
+Qwen2.5-0.5B model). The `firefox/` staging tree was re-synced from
+the same build.
+
+SHA-256 (2026-11-05 build):
+- `pdfx-chrome-edge.zip` — `54bb6d5fe281ff354d89ba0eec248204d33af1ca90faa6dbdcb25809e64b91a4` (404,011,648 bytes)
+- `pdfx-firefox.zip` — `0ce43812654a132487e16e721d2e41a8c2668dbd934649116ad48842420ff21f` (404,011,735 bytes)
+
+Validation on these packages (2026-11-05): both zips opened and
+manifest read back from inside the zip (version 1.1.0; Firefox
+carries the gecko block); the bundled model file inside each zip
+measures 483,003,582 bytes. NOT RUN: real-browser unpacked load and
+`web-ext lint` (no browser/linter in the build environment) —
+Wright's pre-submission legs. Store package-size caps (notably
+AMO's) must be re-checked at submission time against the ~404 MB
+package size.
+
+Store-size verification (2026-11-05, primary sources): Chrome Web
+Store maximum package = 2 GB (compliant). Firefox AMO maximum =
+200 MB — the full Firefox package exceeds it. Fallback variant
+built for the AMO path: `pdfx-firefox-nomodel.zip` — SHA-256
+`2821fb8f598fd70cb96bb21a026310b95b8696b643c1f7ac36c651091e196c85`
+(9,838,156 bytes) — identical except the bundled model weights are
+omitted (the model is then the catalogue's first download). If the
+fallback is what ships to AMO, the Firefox listing's bundled-model
+wording must be scoped accordingly at submission.

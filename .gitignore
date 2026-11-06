@@ -1,0 +1,2 @@
+store/firefox/vendor/models/*/onnx/*.onnx
+extension/vendor/models/*/onnx/*.onnx

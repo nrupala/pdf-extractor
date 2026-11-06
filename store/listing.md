@@ -1,9 +1,9 @@
 # PDF Extractor (pdfx) — store listing copy (Chrome Web Store / Edge Add-ons / Firefox AMO)
 
-Prepared 2026-10-30. One copy set, usable on all three stores; per-store
-field-length notes are inline. Copyright (c) 2026 2351485 ALBERTA INC.
-Licence: MIT. The product is free; tips are welcome and entirely
-optional (see Support).
+Rewritten 2026-11-05 for the self-contained extension (1.1.0). One copy
+set, usable on all three stores; per-store field-length notes are
+inline. Copyright (c) 2026 2351485 ALBERTA INC. Licence: MIT. The
+product is free; tips are welcome and entirely optional (see Support).
 
 ## Name
 
@@ -11,56 +11,92 @@ PDF Extractor (pdfx)
 
 ## One-line summary
 
-Extract text, structure & Word files from PDFs — free, processed on your own machine.
-(85 characters; within Chrome's 132-char summary limit. This replaces
-the earlier "fully local" one-liner under the owner's copy-truth rule
-(2026-10-30): the tab-PDF path downloads from the remote page being
-viewed, so "fully local" unqualified was an overclaim. CANONICAL-SHEET
-§2 is owed the same replacement — flagged in the remediation record.)
+Extract text, structure & Word files from PDFs — entirely in your browser. Nothing is uploaded.
+(95 characters; within Chrome's 132-char summary limit. Same text as
+the extension manifest description. It replaces the 1.0.x companion
+copy under the owner's copy-truth rule: since 1.1.0 the extraction
+engine ships inside the extension, so "in your browser" is the exact
+claim.)
 
 ## Full description
 
-PDF Extractor (pdfx) takes a PDF on your own machine and gives you
-clean text, the book/document structure (chapters, appendices,
-sections), a term/concept index, and decoded metadata — as `.txt`,
-`.md`, `.docx` (Word), or `.json`.
+PDF Extractor (pdfx) takes a PDF and gives you clean text, the
+book/document structure (chapters, appendices, sections), a
+term/concept index, and decoded metadata — as `.txt`, `.md`, `.docx`
+(Word), or `.json`.
 
-**Local processing, no cloud.** There is no account, and no upload to
-any server of ours — we operate no server. Extraction runs on your own
-machine, and the extension itself never fetches anything from the
-internet: the one download in the product happens on your own machine,
-made by your local pdfx API fetching the tab PDF described below. The
-extension does nothing on its own: it hands the PDF (or, for the tab
-feature, the tab's URL) to the free pdfx API running on your own
-computer (`pdfx-api`, 127.0.0.1:8765) and shows you what comes back —
-read the extracted text in the popup, copy it, or download the result
-file.
+**Self-contained: install it and it works.** The extraction engine
+(pdf.js) ships inside the extension. There is nothing else to
+download, install, or start — no companion app, no local server, no
+account. Extraction runs entirely in your browser; nothing is
+uploaded anywhere. We operate no server for this product.
 
 Two ways to give it a PDF, both at your explicit click:
 
-- **Pick a file** in the popup — it is sent to your local API only.
-- **Use the current tab's PDF URL** — if the tab you are viewing is a
-  PDF, the extension passes that tab's URL to your local API, and the
-  API — running on your own computer — downloads the PDF from the site
-  you are already viewing and extracts it. The API fetches defensively:
-  it resolves the site's hostname itself and refuses the request if
-  the address resolves to anything non-public (loopback, private,
-  link-local, or reserved), connects to the validated address
-  directly, and re-validates every redirect hop in full before
-  following it. The fetch target is always the tab you invoked the
-  action on.
+- **Pick a file** in the popup. It is processed in the browser and
+  never leaves your machine.
+- **Use the current tab's PDF** — if the tab you are viewing is a
+  PDF, the extension fetches that tab's own PDF (the file your
+  browser is already displaying) and extracts it. That fetch is the
+  only network request the extension can make: it goes to the exact
+  URL of the tab you clicked from, under the activeTab grant, is
+  capped at 50 MB, and the response is verified as a PDF by its
+  `%PDF` header before use. There is no URL input field and no other
+  fetch target in the code.
 
-**What you need:** the free, open-source (MIT) PDF Extractor package
-installed on the same computer, with its local API running:
+**Big documents get a room, not a popup.** Documents over 25 pages
+open in the workspace — a full browser tab in feedreader format:
+structure and top terms on the left, the extracted text on the
+right. Extraction there proceeds page by page with a progress bar
+and no time limit, so a several-hundred-page book completes instead
+of dying against a popup. You can also send any document to the
+workspace explicitly from the popup.
 
-- Project: https://github.com/nrupala/pdf-extractor
-- Start the API with one command: `pdfx-api`
+**A knowledgebank, not just an extraction.** In the workspace you
+can file a document — or any page range of it — into containers
+you create (name + colour) with your own tags. Filed items are
+fully manageable — save, edit (title, tags, containers, notes, and
+the working text itself), move between containers, delete for real
+— and their `.json` / `.md` / `.txt` / `.docx` outputs regenerate
+from the current text at download time, so outputs are never out
+of sync with your edits. Everything lives only in your browser's
+local storage (IndexedDB): searchable, filterable by container and
+tag, readable in the three-pane bank view, and exportable per item,
+per container, or as a whole-bank `.json` / `.md` bundle at any
+time. Your bank is never uploaded and never trapped.
 
-If the API is not running, the popup shows an error telling you so —
-it never fails silently.
+**Talk to the page.** In the workspace you can ask questions of the
+document or filed item you are reading. Answers are grounded in the
+text itself: retrieval over the item's own passages returns the
+bearing passages with their page citations (click one to open it,
+highlighted, in the reader). A small AI model ships inside the
+extension (Qwen2.5-0.5B, Apache-2.0) and runs on your device to
+phrase answers from those passages; larger 7B-class models are
+available from an in-workspace catalogue, downloaded to your
+machine on your click. Only models ever travel — no document
+content leaves your machine for this feature, ever. Every feature
+is fully available to everyone, on documents of any size; free use
+includes 15 minutes of talk in total, after which talk pauses
+(it never degrades). Pro — a one-time payment, no subscription —
+removes the meter for life. Extraction, filing, and export are
+never metered.
 
 **Free, tips only.** PDF Extractor is a free product with no pricing
 and no checkout. If it saved you time, tips are welcome (see Support).
+
+**For power users:** the same engine is also a free, open-source
+(MIT) Python package — CLI, local API and MCP server — for scripts
+and pipelines: https://github.com/nrupala/pdf-extractor. The
+extension does not need it; it is there if you want it.
+
+## What's new (1.1.0)
+
+The extension is now self-contained: the extraction engine runs
+entirely in your browser (no companion app to install or start),
+large documents open in a full-tab workspace with page-by-page
+progress and no time limit, and Word (.docx) export is generated
+in the browser. This text copies the CHANGELOG entry for Extension
+1.1.0 verbatim, per the update-chain rule.
 
 ## Category suggestion
 
@@ -71,33 +107,40 @@ and no checkout. If it saved you time, tips are welcome (see Support).
 
 ## Permission justifications (for reviewers)
 
-- **`activeTab`** — exercised by exactly one feature: the "Use current
-  tab PDF URL" button calls `chrome.tabs.query({active: true,
-  currentWindow: true})` to read the active tab's URL and sends that
-  URL to the user's local API (`POST /extract-url`). The extension
-  performs only a cheap pre-check (http/https scheme; the URL path
-  must end in `.pdf`) so an obviously unusable tab fails fast with a
-  clear message; the security validation is the API's, on the user's
-  own machine: the API resolves the hostname itself, refuses the
-  request if ANY resolved address is loopback, private, link-local,
-  multicast, reserved, or unspecified, connects to the validated
-  address directly (the hostname is used only for the Host header and
-  TLS name), follows redirects manually (max 3) with the full
-  validation repeated at every hop, enforces a 50 MB cap, and
-  verifies the response is a PDF (content type, with a `%PDF`
-  magic-byte check on generic binary responses) before extracting.
-  The extension itself never downloads the tab PDF. No tab data is
-  read at any other time, and no browsing history is accessed.
-- **host_permissions — `http://127.0.0.1:8765/*` only.** Loopback
-  only, on the one fixed port of the product's local API — the only
-  host the code calls. The extension POSTs the PDF (picked file) or
-  the tab's URL (tab feature) to the API the user runs on their own
-  machine and reads the extracted result.
+- **`activeTab`** — exercised by exactly one feature: the "Use
+  current tab PDF" button. On the user's click it reads the active
+  tab's URL via `chrome.tabs.query({active: true, currentWindow:
+  true})`, checks it is an http(s) URL whose path ends in `.pdf`,
+  and fetches that URL — the PDF the user's browser is already
+  displaying — so it can be extracted by the in-extension engine.
+  The response is capped at 50 MB and verified by its `%PDF` magic
+  bytes before the engine touches it. No other tab data is read at
+  any time, no browsing history is accessed, and there is no URL
+  input field: the fetch target is always the tab the user invoked
+  the action on.
 - **`clipboardWrite`** — declared for exactly one action: the Copy
   button writes the extracted text to the clipboard via
   `navigator.clipboard.writeText`, only when the user clicks it.
+- **host_permissions — `https://aimlds.org/*` only.** Used by
+  exactly two user-initiated features, both in the workspace:
+  talk-to-the-page licence validation (sends the licence key the
+  user typed and the product id — never document content) and
+  model catalogue downloads (the browser fetches model files from
+  our host to the user's machine; only models travel). No other
+  hosts are declared.
 - **No other API permissions.** No storage, history, cookies, or
-  scripting permissions are declared or used.
+  scripting permissions are declared. Apart from the activeTab fetch
+  above and the licence validation, the extension makes no network
+  requests: the extraction engine (pdf.js) is vendored into the
+  package, and picked files never leave the machine.
+- **Local storage (IndexedDB):** when a document is routed to the
+  workspace tab, the popup stores that one document in the
+  browser's own IndexedDB (on this device only) so the workspace
+  tab can read it; it is replaced by the next routed document and
+  removable at any time with the workspace's "Forget document"
+  button. Knowledgebank containers, filed items, their generated
+  output files, and the licence record likewise live only in
+  IndexedDB on this device. Nothing is synced or transmitted.
 
 ## Privacy statement (store privacy fields + listing)
 
@@ -107,23 +150,23 @@ PDF Extractor (pdfx) collects **no data for the developer, ever**.
   collected, stored, sold, or transmitted to us or to any analytics,
   telemetry, crash-reporting, advertising, or third-party service.
   We operate no server for this product to send anything to.
-- A PDF you pick in the popup is sent only to the pdfx API running on
-  your own machine (`http://127.0.0.1:8765`), which processes it
-  locally and keeps nothing after responding.
-- The extension itself makes no non-loopback requests at all. The one
-  download in the product happens only when you click "Use current
-  tab PDF URL": your local pdfx API — running on your own machine —
-  downloads the PDF from the very page you are viewing, after
-  validating that the page's address resolves to a public address
-  only. The download goes from the site to your own computer —
-  nothing about it is sent to us.
-- Extracted text is held only in the popup's memory while the popup is
-  open (so you can read, copy, or download it). The extension uses no
-  persistent storage.
+- A PDF you pick is processed inside your browser and never leaves
+  your machine. The extension can make two network requests, both
+  described above: the current-tab fetch (your browser fetching the
+  PDF you are already viewing, from the site you are viewing it
+  on) and talk-to-the-page licence validation (the key you typed
+  and the product id only — no document content). Nothing about
+  either is content of yours sent to us; we receive no documents,
+  ever.
+- A document routed to the workspace, and everything you file into
+  the knowledgebank (items, their generated output files, tags,
+  containers), is held in the browser's local IndexedDB on your
+  device only. Extraction results are otherwise held in page memory
+  while the popup or workspace is open.
 
 Single-purpose statement (Chrome): PDF Extractor (pdfx)'s single
 purpose is to extract text, structure, and metadata from a
-user-selected PDF, computed by the user's own local pdfx API.
+user-selected PDF, computed entirely inside the user's browser.
 
 ## Support
 

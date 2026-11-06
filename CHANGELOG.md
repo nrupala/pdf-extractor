@@ -8,6 +8,61 @@ browser extension version lives in `extension/manifest.json`. Under the
 owner's rule, every version bump carries its entry in this file in the
 same commit — this file is the start of that chain.
 
+## [Extension 1.1.0] — 2026-11-05
+
+The extension is now self-contained: the extraction engine runs
+entirely in your browser (no companion app to install or start),
+large documents open in a full-tab workspace with page-by-page
+progress and no time limit, and Word (.docx) export is generated
+in the browser.
+
+### Added
+
+- In-browser extraction engine (pdf.js, vendored into the
+  extension) producing the same document shape as the Python
+  engine: text, decoded metadata, page count, structure
+  (chapters/appendices/sections), term/concept index.
+- Workspace tab in feedreader format — structure and top terms on
+  the left, extracted text on the right — with `.txt` / `.md` /
+  `.json` / `.docx` downloads. Documents over 25 pages route here
+  automatically; any document can be sent explicitly.
+- Page-by-page progress in the popup and the workspace. There is
+  no timeout on extraction.
+- Knowledgebank in the workspace: file a document or any page
+  range into user-created containers (name + colour) with tags;
+  full management (save, save-as, edit title/tags/containers/
+  notes/working text, move, real delete; container delete with
+  move-out or delete-with choice); outputs (`.json` / `.md` /
+  `.txt` / `.docx`) regenerate from the item's current text at
+  download; per-item, per-container and whole-bank export.
+  Local IndexedDB only.
+- Talk to the page: passage retrieval indexed at filing time,
+  answers with clickable citations that open the passage in the
+  reader; a bundled on-device model (Qwen2.5-0.5B-Instruct,
+  Apache-2.0, via vendored Transformers.js) phrases answers from
+  the retrieved passages, with a downloadable 7B-class model
+  catalogue (models only ever travel; documents never leave).
+  Free talk is metered at 15 minutes of use in total and then
+  pauses; Pro (one-time, lifetime, no subscription) removes the
+  meter. No feature is size-gated.
+- About / Settings area: the only commercial surface — tip jar
+  (gratitude, whenever and as often as you wish), Pro purchase,
+  and the licence-key field live there and nowhere else.
+
+### Removed
+
+- The companion local API dependency: the extension no longer
+  contacts the loopback API, and the manifest drops its loopback
+  `host_permissions`. The Python package's CLI, local API and MCP
+  surfaces are unchanged and remain available for power users.
+
+### Changed
+
+- "Use current tab PDF": the extension now fetches the active
+  tab's own PDF itself, at the user's click under `activeTab`
+  (50 MB cap, `%PDF` magic bytes verified), instead of handing
+  the URL to a local API to fetch.
+
 ## [1.0.1] — 2026-10-26
 
 First open-source release (MIT), published 2026-10-26.
