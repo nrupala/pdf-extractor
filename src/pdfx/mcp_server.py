@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 2351485 ALBERTA INC.
+#
+# SPDX-License-Identifier: MIT
 
 """MCP server (stdio, JSON-RPC) - tools: extract_pdf, pdf_metadata, pdf_structure. No extra MCP SDK dependency."""
 from __future__ import annotations
