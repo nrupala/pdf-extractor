@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2026 2351485 ALBERTA INC.
+
+SPDX-License-Identifier: MIT
+-->
+
 # Changelog
 
 All notable changes to PDF Extractor (pdfx) are recorded in this file,
