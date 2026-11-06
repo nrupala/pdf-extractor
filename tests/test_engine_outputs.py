@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026 2351485 ALBERTA INC.
+#
+# SPDX-License-Identifier: MIT
+
 """Engine/output tests incl. docx and the two wart fixes."""
 import json
 from pathlib import Path
