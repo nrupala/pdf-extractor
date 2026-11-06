@@ -1,5 +1,7 @@
 # PDF Extractor (pdfx)
 
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/16394/badge)](https://www.bestpractices.dev/en/projects/16394)
+
 Extract text, structure & Word files from PDFs — free, fully local.
 
 PDF Extractor takes a PDF on your own machine and gives you clean text, the
