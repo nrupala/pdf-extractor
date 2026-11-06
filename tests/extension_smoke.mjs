@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 2351485 ALBERTA INC.
+//
+// SPDX-License-Identifier: MIT
+
 // Extension smoke test — exercises the self-contained (1.1.0+)
 // in-browser engine end to end in Node: the vendored pdf.js build
 // extracts the fixture PDFs through extension/engine.js, the popup's
