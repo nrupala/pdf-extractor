@@ -1,3 +1,7 @@
+<!--
+SPDX-License-Identifier: MIT
+-->
+
 # PDF Extractor (pdfx)
 
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/16394/badge)](https://www.bestpractices.dev/en/projects/16394)
