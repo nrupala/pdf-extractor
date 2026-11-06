@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026 2351485 ALBERTA INC.
+#
+# SPDX-License-Identifier: MIT
+
 """PDF Extractor (pdfx)."""
 __version__="1.0.1"
 from .core import extract_document, get_metadata, parse_structure, build_index, decode_value
