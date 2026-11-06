@@ -1,0 +1,69 @@
+version = 1
+
+# Own artwork and store assets (extension icons, store screenshot, packaged
+# store zip) — project licence; declared in bulk (binary files).
+[[annotations]]
+path = [
+    "extension/icons/**",
+    "store/firefox/icons/**",
+    "store/screenshot-1.png",
+    "store/pdfx-firefox-nomodel.zip",
+]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 2351485 ALBERTA INC."
+SPDX-License-Identifier = "MIT"
+
+# Own test fixtures (sample PDFs the test suite extracts from).
+[[annotations]]
+path = "tests/fixtures/**"
+precedence = "override"
+SPDX-FileCopyrightText = "2026 2351485 ALBERTA INC."
+SPDX-License-Identifier = "MIT"
+
+# Vendored PDF.js (Mozilla Foundation, Apache-2.0 — licence text ships in
+# vendor/LICENSE.pdfjs). Both the extension copy and the store copy.
+[[annotations]]
+path = [
+    "extension/vendor/pdf.min.js",
+    "extension/vendor/pdf.worker.min.js",
+    "store/firefox/vendor/pdf.min.js",
+    "store/firefox/vendor/pdf.worker.min.js",
+]
+precedence = "override"
+SPDX-FileCopyrightText = "Mozilla Foundation"
+SPDX-License-Identifier = "Apache-2.0"
+
+# Vendored Transformers.js bundle (Hugging Face, Apache-2.0 — licence text
+# ships in vendor/transformers/LICENSE.transformers).
+[[annotations]]
+path = [
+    "extension/vendor/transformers/transformers.min.mjs",
+    "store/firefox/vendor/transformers/transformers.min.mjs",
+]
+precedence = "override"
+SPDX-FileCopyrightText = "Hugging Face"
+SPDX-License-Identifier = "Apache-2.0"
+
+# Vendored ONNX Runtime Web binaries (Microsoft, MIT), shipped beside the
+# Transformers.js bundle.
+[[annotations]]
+path = [
+    "extension/vendor/transformers/ort-wasm-simd-threaded.jsep.mjs",
+    "extension/vendor/transformers/ort-wasm-simd-threaded.jsep.wasm",
+    "store/firefox/vendor/transformers/ort-wasm-simd-threaded.jsep.mjs",
+    "store/firefox/vendor/transformers/ort-wasm-simd-threaded.jsep.wasm",
+]
+precedence = "override"
+SPDX-FileCopyrightText = "Microsoft Corporation"
+SPDX-License-Identifier = "MIT"
+
+# Vendored Qwen2.5-0.5B-Instruct model files (Alibaba Cloud; the Apache-2.0
+# licence text ships inside the model directory).
+[[annotations]]
+path = [
+    "extension/vendor/models/**",
+    "store/firefox/vendor/models/**",
+]
+precedence = "override"
+SPDX-FileCopyrightText = "Alibaba Cloud"
+SPDX-License-Identifier = "Apache-2.0"
