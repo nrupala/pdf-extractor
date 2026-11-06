@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2026 2351485 ALBERTA INC.
+
+SPDX-License-Identifier: MIT
+-->
+
 # PDF Extractor (pdfx) extension 1.1.0 — Gemini pre-store check (2026-11-05)
 
 **Outcome: SATISFACTORY WITH FINDINGS** (Gemini's verdict; the
