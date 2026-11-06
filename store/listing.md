@@ -1,3 +1,7 @@
+<!--
+SPDX-License-Identifier: MIT
+-->
+
 # PDF Extractor (pdfx) — store listing copy (Chrome Web Store / Edge Add-ons / Firefox AMO)
 
 Rewritten 2026-11-05 for the self-contained extension (1.1.0). One copy
