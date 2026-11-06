@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026 2351485 ALBERTA INC.
+#
+# SPDX-License-Identifier: MIT
+
 """POST /extract-url: SSRF refusal classes + happy path.
 
 All network is stubbed: socket.getaddrinfo is replaced with a fixed
