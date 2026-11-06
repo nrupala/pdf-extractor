@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 2351485 ALBERTA INC.
+#
+# SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 import re
