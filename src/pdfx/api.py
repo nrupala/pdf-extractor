@@ -1,6 +1,6 @@
 
 from __future__ import annotations
-import http.client, ipaddress, socket, ssl, tempfile, os
+import http.client, ipaddress, logging, socket, ssl, tempfile, os
 from pathlib import Path
 from urllib.parse import urljoin, urlsplit
 try:
@@ -67,7 +67,9 @@ def _open_connection(scheme,host,port,ip_str):
     still apply to the real hostname."""
     raw=socket.create_connection((ip_str,port),timeout=_URL_TIMEOUT)
     if scheme=="https":
-        sock=ssl.create_default_context().wrap_socket(raw,server_hostname=host)
+        ctx=ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        ctx.minimum_version=ssl.TLSVersion.TLSv1_2
+        sock=ctx.wrap_socket(raw,server_hostname=host)
         conn=http.client.HTTPSConnection(ip_str,port,timeout=_URL_TIMEOUT)
     else:
         sock=raw
@@ -161,7 +163,9 @@ def create_app():
     async def extract(file: UploadFile=File(...), format: str=Form("json"), engine: str=Form("pdfminer")):
         data=await file.read()
         with tempfile.TemporaryDirectory() as td:
-            src=Path(td)/(file.filename or "input.pdf"); src.write_bytes(data)
+            raw_name=file.filename or "input.pdf"
+            safe_name=raw_name.replace("\\","/").rsplit("/",1)[-1] or "input.pdf"
+            src=Path(td)/safe_name; src.write_bytes(data)
             doc=extract_document(src,engine=engine)
             if format=="json": return JSONResponse(doc)
             if format in WRITERS:
@@ -211,9 +215,12 @@ def create_app():
             return JSONResponse({"error":str(e)},status_code=400)
         with tempfile.TemporaryDirectory() as td:
             stem=Path(urlsplit(final_url).path).stem or "tab"
+            stem="".join(c if (c.isalnum() or c in "._-") else "_" for c in stem).strip(".") or "tab"
             src=Path(td)/f"{stem}.pdf"; src.write_bytes(data)
             try: doc=extract_document(src,engine=payload.engine)
-            except Exception as e: return JSONResponse({"error":f"Could not extract that PDF ({e})."},status_code=400)
+            except Exception as e:
+                logging.getLogger("pdfx.api").exception("extract-url: extraction failed for %s",final_url)
+                return JSONResponse({"error":"Could not extract that PDF."},status_code=400)
             if payload.format=="json": return JSONResponse(doc)
             if payload.format in WRITERS:
                 dest=Path(td)/f"{src.stem}{EXT[payload.format]}"; WRITERS[payload.format](doc,dest)
