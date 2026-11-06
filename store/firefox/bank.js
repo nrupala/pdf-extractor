@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 2351485 ALBERTA INC.
+//
+// SPDX-License-Identifier: MIT
+
 "use strict";
 /*
  * PDF Extractor (pdfx) — knowledgebank data model.
