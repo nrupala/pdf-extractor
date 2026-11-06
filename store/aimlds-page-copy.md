@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2026 2351485 ALBERTA INC.
+
+SPDX-License-Identifier: MIT
+-->
+
 # aimlds.org page copy — /products/pdf-extractor (PREPARED 2026-11-05, NOT DEPLOYED)
 
 Status: release-prep deliverable for the extension 1.1.0 rebuild.
