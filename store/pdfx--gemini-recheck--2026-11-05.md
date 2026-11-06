@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2026 2351485 ALBERTA INC.
+
+SPDX-License-Identifier: MIT
+-->
+
 # Gemini pre-store re-check — pdfx 1.1.1 fix build (2026-11-05)
 
 Request: Gemini (custom.gemini connector, model gemini-3.1-flash-lite,
