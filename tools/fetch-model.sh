@@ -1,4 +1,9 @@
 #!/bin/sh
+
+# SPDX-FileCopyrightText: 2026 2351485 ALBERTA INC.
+#
+# SPDX-License-Identifier: MIT
+
 # Fetch the bundled talk model's weights into the extension tree.
 # The weights (483 MB) exceed GitHub's per-file limit, so they are
 # not stored in git; the store packages are built from a tree that
