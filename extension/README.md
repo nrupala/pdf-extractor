@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2026 2351485 ALBERTA INC.
+
+SPDX-License-Identifier: MIT
+-->
+
 # Browser extension (MV3)
 
 Load unpacked: chrome://extensions → Developer mode → Load unpacked →
