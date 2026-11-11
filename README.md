@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/16394/badge)](https://www.bestpractices.dev/en/projects/16394)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/nrupala/pdf-extractor/badge)](https://scorecard.dev/viewer/?uri=github.com/nrupala/pdf-extractor)
 [![REUSE status](https://api.reuse.software/badge/github.com/nrupala/pdf-extractor)](https://api.reuse.software/info/github.com/nrupala/pdf-extractor)
+[![Licence](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
 
 Extract text, structure & Word files from PDFs — free, fully local.
 
