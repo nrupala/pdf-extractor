@@ -48,7 +48,11 @@ pdfx-mcp
 ```
 
 Tools: `extract_pdf`, `pdf_metadata`, `pdf_structure`. Point your MCP client
-at the `pdfx-mcp` command.
+at the `pdfx-mcp` command. Agents: see [`SKILL.md`](SKILL.md) for when to
+reach for these tools and the limits to check before trusting the output.
+
+No Python handy? Prebuilt installers (Windows setup/zip, Linux and macOS
+tarballs) are attached to the GitHub Releases — see **Installers** below.
 
 ### 4. Browser extension
 
@@ -80,22 +84,40 @@ and we do not fake one.
 
 ## Sample output
 
+Real output, captured from the repository's own test fixture
+(`tests/fixtures/sample_book.pdf`) with the current release code:
+
 ```
-$ pdfx proposal.pdf --info
+$ pdfx sample_book.pdf --info --format txt
 PDF Metadata:
-- pages: 3
-- title: …
-- author: …
-Wrote extracted_proposal/proposal.txt
-Wrote extracted_proposal/proposal.md
-Wrote extracted_proposal/proposal.docx
-Wrote extracted_proposal/proposal.json
-Extracted 6,214 characters, 3 pages
+- pages: 4
+- title: Sample Book
+- author: A. Author
+- creator: anonymous
+- producer: ReportLab PDF Library - (opensource)
+Wrote extracted_sample_book/sample_book.txt
+Extracted 415 characters, 4 pages
 ```
 
 The JSON output carries `text`, decoded `metadata`, `structure`
 (chapters / appendices / sections), and `index` (concepts, term count,
 top terms).
+
+## Known limits — what pdfx does not do
+
+- **No OCR.** pdfx reads the PDF's text layer (pdfminer.six, or PyPDF2
+  in page-marked mode). A scanned or image-only PDF has no text layer,
+  so extraction returns empty text for it — that means "no text layer
+  found", not "the document is empty". OCR is not performed.
+- **Structure is detected, not guaranteed.** The structure layer is a
+  heading parser over the extracted text; it reports the chapters,
+  appendices, and sections it can detect in that text. A document
+  whose headings the parser cannot detect yields an empty structure,
+  not an error.
+- **Metadata caveat.** Metadata values are decoded for the common
+  cases; some producer metadata objects are not JSON-serializable in
+  the current build, in which case the `.json` write can fail after
+  the `.txt` / `.md` / `.docx` outputs have been written.
 
 ## How it works
 
